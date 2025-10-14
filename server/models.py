@@ -20,8 +20,8 @@ class User(db.Model, SerializerMixin):
     # Association proxy - get all service providers this user has reviewed
     reviewed_services = association_proxy('reviews', 'service_provider')
     
-    # Serialization rules
-    serialize_rules = ('-service_providers.user', '-reviews.user', '-reviewed_services')
+    # Serialization rules - prevent infinite recursion
+    serialize_only = ('id', 'name', 'email', 'created_at')
     
     # Validations
     @validates('name')
@@ -39,6 +39,17 @@ class User(db.Model, SerializerMixin):
         if len(email) > 120:
             raise ValueError("Email must be less than 120 characters")
         return email.lower().strip()
+    
+    def to_dict_with_relations(self):
+        """Custom serialization with relationships"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'service_providers': [sp.to_dict() for sp in self.service_providers],
+            'reviews': [r.to_dict() for r in self.reviews]
+        }
     
     def __repr__(self):
         return f'<User {self.id}: {self.name}>'
@@ -67,8 +78,8 @@ class ServiceProvider(db.Model, SerializerMixin):
     # Association proxy - get all users who reviewed this service
     reviewers = association_proxy('reviews', 'user')
     
-    # Serialization rules
-    serialize_rules = ('-user.service_providers', '-reviews.service_provider', '-reviewers')
+    # Serialization rules - prevent infinite recursion
+    serialize_only = ('id', 'name', 'category', 'description', 'location', 'phone', 'hours', 'created_at', 'user_id')
     
     # Validations
     @validates('name')
@@ -119,6 +130,27 @@ class ServiceProvider(db.Model, SerializerMixin):
                 raise ValueError("Phone number must be between 8 and 15 digits")
         return phone
     
+    def to_dict_with_reviews(self):
+        """Custom serialization with reviews"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category': self.category,
+            'description': self.description,
+            'location': self.location,
+            'phone': self.phone,
+            'hours': self.hours,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'user_id': self.user_id,
+            'user': {
+                'id': self.user.id,
+                'name': self.user.name,
+                'email': self.user.email
+            } if self.user else None,
+            'reviews': [r.to_dict() for r in self.reviews],
+            'average_rating': sum(r.rating for r in self.reviews) / len(self.reviews) if self.reviews else 0
+        }
+    
     def __repr__(self):
         return f'<ServiceProvider {self.id}: {self.name}>'
 
@@ -140,8 +172,8 @@ class Review(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='reviews')
     service_provider = db.relationship('ServiceProvider', back_populates='reviews')
     
-    # Serialization rules
-    serialize_rules = ('-user.reviews', '-service_provider.reviews')
+    # Serialization rules - prevent infinite recursion
+    serialize_only = ('id', 'rating', 'comment', 'created_at', 'user_id', 'service_provider_id')
     
     # Validations
     @validates('rating')
@@ -159,6 +191,25 @@ class Review(db.Model, SerializerMixin):
         if len(comment) > 500:
             raise ValueError("Comment must be less than 500 characters")
         return comment.strip()
+    
+    def to_dict_with_relations(self):
+        """Custom serialization with user and service info"""
+        return {
+            'id': self.id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'user_id': self.user_id,
+            'service_provider_id': self.service_provider_id,
+            'user': {
+                'id': self.user.id,
+                'name': self.user.name
+            } if self.user else None,
+            'service_provider': {
+                'id': self.service_provider.id,
+                'name': self.service_provider.name
+            } if self.service_provider else None
+        }
     
     def __repr__(self):
         return f'<Review {self.id}: {self.rating} stars>'
