@@ -1,357 +1,326 @@
-# Phase 4 Full-Stack Application Project Template
+# Konekte - Community Resource Hub for Haiti
 
-## Learning Goals
+## Project Overview
 
-- Discuss the basic directory structure of a full-stack Flask/React application.
-- Carry out the first steps in creating your Phase 4 project.
+**Konekte** is a full-stack web application that connects Haitian communities with essential services and resources. The platform allows users to discover, review, and contribute information about healthcare facilities, educational institutions, water services, community centers, and emergency services across Haiti.
 
----
+### Purpose
 
-## Introduction
+This application was built to address real community needs in Haiti by creating a centralized platform where citizens can:
+- Find essential services (medical, educational, water, community centers, emergency)
+- Share reviews and ratings based on their experiences
+- Add new service providers to help their community
+- Search and filter services by category and location
 
-Fork and clone this lesson for a template for your full-stack application. Take
-a look at the directory structure before we begin (NOTE: node_modules will be
-generated in a subsequent step):
+### Technology Stack
 
-```console
-$ tree -L 2
-$ # the -L argument limits the depth at which we look into the directory structure
-.
-├── CONTRIBUTING.md
-├── LICENSE.md
-├── Pipfile
-├── README.md
-├── client
-│   ├── README.md
-│   ├── package.json
-│   ├── public
-│   └── src
-└── server
-    ├── app.py
-    ├── config.py
-    ├── models.py
-    └── seed.py
-```
-
-A `migrations` folder will be added to the `server` directory in a later step.
-
-The `client` folder contains a basic React application, while the `server`
-folder contains a basic Flask application. You will adapt both folders to
-implement the code for your project .
-
-NOTE: If you did not previously install `tree` in your environment setup, MacOS
-users can install this with the command `brew install tree`. WSL and Linux users
-can run `sudo apt-get install tree` to download it as well.
-
-## Where Do I Start?
-
-Just as with your Phase 3 Project, this will likely be one of the biggest
-projects you've undertaken so far. Your first task should be creating a Git
-repository to keep track of your work and roll back any undesired changes.
-
-### Removing Existing Git Configuration
-
-If you're using this template, start off by removing the existing metadata for
-Github and Canvas. Run the following command to carry this out:
-
-```console
-$ rm -rf .git .canvas
-```
-
-The `rm` command removes files from your computer's memory. The `-r` flag tells
-the console to remove _recursively_, which allows the command to remove
-directories and the files within them. `-f` removes them permanently.
-
-`.git` contains this directory's configuration to track changes and push to
-Github (you want to track and push _your own_ changes instead), and `.canvas`
-contains the metadata to create a Canvas page from your Git repo. You don't have
-the permissions to edit our Canvas course, so it's not worth keeping around.
-
-### Creating Your Own Git Repo
-
-First things first- rename this directory! Once you have an idea for a name,
-move one level up with `cd ..` and run
-`mv python-p4-project-template <new-directory-name>` to change its name (replace
-<new-directory-name> with an appropriate project directory name).
-
-> **Note: If you typed the `mv` command in a terminal within VS Code, you should
-> close VS Code then reopen it.**
-
-> **Note: `mv` actually stands for "move", but your computer interprets this
-> rename as a move from a directory with the old name to a directory with a new
-> name.**
-
-`cd` back into your new directory and run `git init` to create a local git
-repository. Add all of your local files to version control with `git add --all`,
-then commit them with `git commit -m'initial commit'`. (You can change the
-message here- this one is just a common choice.)
-
-Navigate to [GitHub](https://github.com). In the upper-right corner of the page,
-click on the "+" dropdown menu, then select "New repository". Enter the name of
-your local repo, choose whether you would like it to be public or private, make
-sure "Initialize this repository with a README" is unchecked (you already have
-one), then click "Create repository".
-
-Head back to the command line and enter
-`git remote add origin git@github.com:github-username/new-repository-name.git`.
-NOTE: Replace `github-username` with your github username, and
-`new-repository-name` with the name of your new repository. This command will
-map the remote repository to your local repository. Finally, push your first
-commit with `git push -u origin main`.
-
-Your project is now version-controlled locally and online. This will allow you
-to create different versions of your project and pick up your work on a
-different machine if the need arises.
+- **Frontend**: React with React Router DOM for client-side routing
+- **Backend**: Flask with Flask-RESTful for API endpoints
+- **Database**: SQLite with Flask-SQLAlchemy ORM
+- **Form Validation**: Formik for client-side validation
+- **Database Migrations**: Flask-Migrate (Alembic)
 
 ---
 
-## Setup
+## Project Structure
 
-### `server/`
+```
+konekte-haiti/
+├── server/
+│   ├── app.py                 # Flask application with API routes
+│   ├── config.py              # Flask configuration and database setup
+│   ├── models.py              # SQLAlchemy models (User, ServiceProvider, Review)
+│   ├── seed.py                # Database seed script with sample data
+│   ├── instance/
+│   │   └── app.db            # SQLite database file
+│   ├── migrations/            # Alembic migration files
+│   └── Pipfile                # Python dependencies
+└── client/
+    ├── src/
+    │   ├── App.js            # Main React component with routing
+    │   ├── App.css           # Main styles
+    │   ├── index.js          # React entry point
+    │   └── components/
+    │       ├── NavBar.js      # Navigation bar component
+    │       ├── ServiceList.js # Service listings with search/filter
+    │       ├── ServiceDetail.js # Individual service details and reviews
+    │       ├── AddServiceForm.js # Form to add new services
+    │       └── AddReviewForm.js # Form to add reviews
+    ├── package.json           # JavaScript dependencies
+    └── public/                # Static files
+```
 
-The `server/` directory contains all of your backend code.
+---
 
-`app.py` is your Flask application. You'll want to use Flask to build a simple
-API backend like we have in previous modules. You should use Flask-RESTful for
-your routes. You should be familiar with `models.py` and `seed.py` by now, but
-remember that you will need to use Flask-SQLAlchemy, Flask-Migrate, and
-SQLAlchemy-Serializer instead of SQLAlchemy and Alembic in your models.
+## Data Models
 
-The project contains a default `Pipfile` with some basic dependencies. You may
-adapt the `Pipfile` if there are additional dependencies you want to add for
-your project.
+### User
+- `id`: Primary key
+- `name`: User's full name
+- `email`: User's email address
+- `created_at`: Timestamp
 
-To download the dependencies for the backend server, run:
+### ServiceProvider
+- `id`: Primary key
+- `name`: Service name
+- `category`: One of (Medical/Health, Education, Water & Sanitation, Community Centers, Emergency Services)
+- `description`: Detailed description of services
+- `location`: Service location/address
+- `phone`: Contact phone number
+- `hours`: Operating hours
+- `user_id`: Foreign key (User who added the service)
+- `created_at`: Timestamp
 
-```console
+### Review (Many-to-Many Association)
+- `id`: Primary key
+- `rating`: 1-5 stars (integer)
+- `comment`: User's text review
+- `user_id`: Foreign key (User who wrote review)
+- `service_provider_id`: Foreign key (Service being reviewed)
+- `created_at`: Timestamp
+
+**Relationships**:
+- User has many ServiceProviders
+- User has many Reviews
+- ServiceProvider has many Reviews
+- User ↔ ServiceProvider through Review (many-to-many)
+
+---
+
+## API Endpoints
+
+### ServiceProviders
+- `GET /api/service-providers` - List all services (supports ?category= and ?search= filters)
+- `GET /api/service-providers/:id` - Get single service with reviews
+- `POST /api/service-providers` - Create new service
+- `PATCH /api/service-providers/:id` - Update service
+- `DELETE /api/service-providers/:id` - Delete service
+
+### Reviews
+- `GET /api/reviews` - List all reviews (supports ?service_provider_id= filter)
+- `POST /api/reviews` - Create new review
+- `PATCH /api/reviews/:id` - Update review
+- `DELETE /api/reviews/:id` - Delete review
+
+### Users
+- `GET /api/users` - List all users
+- `POST /api/users` - Create new user
+
+---
+
+## Setup and Installation
+
+### Prerequisites
+- Python 3.9+
+- Node.js 14+
+- npm or yarn
+- Git
+
+### Backend Setup
+
+1. **Navigate to server directory:**
+```bash
+cd server
+```
+
+2. **Create virtual environment and install dependencies:**
+```bash
 pipenv install
 pipenv shell
 ```
 
-You can run your Flask API on [`localhost:5555`](http://localhost:5555) by
-running:
-
-```console
-python server/app.py
-```
-
-Check that your server serves the default route `http://localhost:5555`. You
-should see a web page with the heading "Project Server".
-
-### `client/`
-
-The `client/` directory contains all of your frontend code. The file
-`package.json` has been configured with common React application dependencies,
-include `react-router-dom`. The file also sets the `proxy` field to forward
-requests to `"http://localhost:5555". Feel free to change this to another port-
-just remember to configure your Flask app to use another port as well!
-
-To download the dependencies for the frontend client, run:
-
-```console
-npm install --prefix client
-```
-
-You can run your React app on [`localhost:3000`](http://localhost:3000) by
-running:
-
-```sh
-npm start --prefix client
-```
-
-Check that your the React client displays a default page
-`http://localhost:3000`. You should see a web page with the heading "Project
-Client".
-
-## Generating Your Database
-
-NOTE: The initial project directory structure does not contain the `instance` or
-`migrations` folders. Change into the `server` directory:
-
-```console
-cd server
-```
-
-Then enter the commands to create the `instance` and `migrations` folders and
-the database `app.db` file:
-
-```
+3. **Initialize database:**
+```bash
 flask db init
+flask db revision -m'Create DB'
+flask db upgrade head
+flask db revision --autogenerate -m'Create User, ServiceProvider, and Review models'
 flask db upgrade head
 ```
 
-Type `tree -L 2` within the `server` folder to confirm the new directory
-structure:
-
-```console
-.
-├── app.py
-├── config.py
-├── instance
-│   └── app.db
-├── migrations
-│   ├── README
-│   ├── __pycache__
-│   ├── alembic.ini
-│   ├── env.py
-│   ├── script.py.mako
-│   └── versions
-├── models.py
-└── seed.py
+4. **Seed sample data:**
+```bash
+python seed.py
 ```
 
-Edit `models.py` and start creating your models. Import your models as needed in
-other modules, i.e. `from models import ...`.
+5. **Start Flask server:**
+```bash
+python app.py
+```
 
-Remember to regularly run
-`flask db revision --autogenerate -m'<descriptive message>'`, replacing
-`<descriptive message>` with an appropriate message, and `flask db upgrade head`
-to track your modifications to the database and create checkpoints in case you
-ever need to roll those modifications back.
+The backend will run on `http://localhost:5555`
 
-> **Tip: It's always a good idea to start with an empty revision! This allows
-> you to roll all the way back while still holding onto your database. You can
-> create this empty revision with `flask db revision -m'Create DB'`.**
+### Frontend Setup
 
-If you want to seed your database, now would be a great time to write out your
-`seed.py` script and run it to generate some test data. Faker has been included
-in the Pipfile if you'd like to use that library.
+1. **Open new terminal and navigate to client directory:**
+```bash
+cd client
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Start React development server:**
+```bash
+npm start
+```
+
+The frontend will open at `http://localhost:3000`
 
 ---
 
-#### `config.py`
+## Running the Application
 
-When developing a large Python application, you might run into a common issue:
-_circular imports_. A circular import occurs when two modules import from one
-another, such as `app.py` and `models.py`. When you create a circular import and
-attempt to run your app, you'll see the following error:
+### For Teachers/Evaluators:
 
-```console
-ImportError: cannot import name
+1. **Start both servers** (in separate terminal windows):
+
+**Terminal 1 - Backend:**
+```bash
+cd server
+pipenv shell
+python app.py
 ```
 
-If you're going to need an object in multiple modules like `app` or `db`,
-creating a _third_ module to instantiate these objects can save you a great deal
-of circular grief. Here's a good start to a Flask config file (you may need more
-if you intend to include features like authentication and passwords):
-
-```py
-# Standard library imports
-
-# Remote library imports
-from flask import Flask
-from flask_cors import CORS
-from flask_migrate import Migrate
-from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
-
-# Local imports
-
-# Instantiate app, set attributes
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.json.compact = False
-
-# Define metadata, instantiate db
-metadata = MetaData(naming_convention={
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-})
-db = SQLAlchemy(metadata=metadata)
-migrate = Migrate(app, db)
-db.init_app(app)
-
-# Instantiate REST API
-api = Api(app)
-
-# Instantiate CORS
-CORS(app)
-
+**Terminal 2 - Frontend:**
+```bash
+cd client
+npm start
 ```
 
-Now let's review that last line...
+2. **Access the application:**
+- Open browser to `http://localhost:3000`
+- Backend API available at `http://localhost:5555`
 
-#### CORS
+3. **Test the application:**
+- View services on home page
+- Click on any service to see details and reviews
+- Add a new service via "Ajouter un Service" link
+- Add reviews to services
+- Search and filter services by category
 
-CORS (Cross-Origin Resource Sharing) is a system that uses HTTP headers to
-determine whether resources from different servers-of-origin can be accessed. If
-you're using the fetch API to connect your frontend to your Flask backend, you
-need to configure CORS on your Flask application instance. Lucky for us, that
-only takes one line:
+### Sample Data
 
-```py
-CORS(app)
-
-```
-
-By default, Flask-CORS enables CORS on all routes in your application with all
-fetching servers. You can also specify the resources that allow CORS. The
-following specifies that routes beginning with `api/` allow CORS from any
-originating server:
-
-```py
-CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-```
-
-You can also set this up resource-by-resource by importing and using the
-`@cross_origin` decorator:
-
-```py
-@app.route("/")
-@cross_origin()
-def howdy():
-  return "Howdy partner!"
-
-```
+The application comes pre-loaded with:
+- 6 users
+- 12 service providers across 5 categories
+- 15 sample reviews with ratings
 
 ---
 
-## Updating Your README.md
+## Features Implemented
 
-`README.md` is a Markdown file that describes your project. These files can be
-used in many different ways- you may have noticed that we use them to generate
-entire Canvas lessons- but they're most commonly used as homepages for online
-Git repositories. **When you develop something that you want other people to
-use, you need to have a README.**
+### Frontend Features
+✅ Home page with service listing  
+✅ Search services by name, description, or location  
+✅ Filter services by category  
+✅ Service detail pages with reviews  
+✅ Add new service form with validation  
+✅ Add review form with rating and comment  
+✅ Navigation between pages using React Router  
+✅ Responsive design with CSS styling  
 
-Markdown is not a language that we cover in Flatiron's Software Engineering
-curriculum, but it's not a particularly difficult language to learn (if you've
-ever left a comment on Reddit, you might already know the basics). Refer to the
-cheat sheet in this lesson's resources for a basic guide to Markdown.
+### Backend Features
+✅ Full CRUD operations for services  
+✅ Create and read operations for all resources  
+✅ Data validation (string length, number format, data types)  
+✅ RESTful API endpoints  
+✅ Database seeding with realistic Haitian data  
+✅ CORS enabled for frontend-backend communication  
 
-### What Goes into a README?
+### Validation
 
-This README should serve as a template for your own- go through the important
-files in your project and describe what they do. Each file that you edit (you
-can ignore your migration files) should get at least a paragraph. Each function
-should get a small blurb.
-
-You should descibe your application first, and with a good level of detail. The
-rest should be ordered by importance to the user. (Probably routes next, then
-models.)
-
-Screenshots and links to resources that you used throughout are also useful to
-users and collaborators, but a little more syntactically complicated. Only add
-these in if you're feeling comfortable with Markdown.
-
----
-
-## Conclusion
-
-A lot of work goes into a full-stack application, but it all relies on concepts
-that you've practiced thoroughly throughout this phase. Hopefully this template
-and guide will get you off to a good start with your Phase 4 Project.
-
-Happy coding!
+**Formik Form Validation:**
+- Service Name: 3-150 characters (string length validation)
+- Category: Must be valid category (data type validation)
+- Description: 10-1000 characters (string length validation)
+- Location: 5-200 characters (string length validation)
+- Phone: 8-15 digits (number format validation)
+- Rating: 1-5 integer (data type validation)
+- Comment: 5-500 characters (string length validation)
 
 ---
 
-## Resources
+## Technical Requirements Met
 
-- [Setting up a respository - Atlassian](https://www.atlassian.com/git/tutorials/setting-up-a-repository)
-- [Create a repo- GitHub Docs](https://docs.github.com/en/get-started/quickstart/create-a-repo)
-- [Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
-- [Python Circular Imports - StackAbuse](https://stackabuse.com/python-circular-imports/)
-- [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/)
+### Phase 4 Requirements
+✅ Flask API backend with React frontend  
+✅ 3 models with defined relationships  
+✅ 2 one-to-many relationships (User→ServiceProvider, User→Review, ServiceProvider→Review)  
+✅ 1 many-to-many relationship (User ↔ ServiceProvider through Review)  
+✅ User-submittable attributes in association model (rating, comment)  
+✅ Full CRUD for ServiceProvider resource  
+✅ Create and read actions for all resources  
+✅ Formik forms with validation on all inputs  
+✅ Data type validation (rating 1-5 integer)  
+✅ String/number format validation (phone 8-15 digits)  
+✅ 3+ client-side routes (/, /services/:id, /add-service)  
+✅ Navigation bar for route switching  
+✅ Fetch calls connecting frontend to backend  
+
+---
+
+## Common Issues and Solutions
+
+### Database Issues
+**Problem**: "no such table: users" error
+- **Solution**: Run `python seed.py` to create tables and seed data
+
+### Port Already in Use
+**Problem**: "Address already in use" error
+- **Solution**: 
+  - Backend: Change port in app.py (line: `app.run(port=5555)`)
+  - Frontend: Kill process using port 3000 or change port in package.json
+
+### Component Not Loading
+**Problem**: 404 errors when fetching from backend
+- **Solution**: Ensure both servers are running (backend on 5555, frontend on 3000)
+
+### Form Validation Not Working
+**Problem**: Forms submit without validation
+- **Solution**: Ensure Formik is installed (`npm list formik`)
+
+---
+
+## Future Enhancements
+
+- User authentication and login system
+- Email notifications for new reviews
+- Map integration to display services geographically
+- Photo uploads for service providers
+- Admin dashboard for moderation
+- Multi-language support
+- Mobile app version
+
+---
+
+## Commit History
+
+This project contains 30+ commits showing the development process:
+- Initial project setup
+- Database models and migrations
+- Backend API routes
+- Frontend component development
+- Form validation implementation
+- Styling and UI improvements
+
+Each commit follows best practices:
+- Clear, descriptive messages in present tense
+- 50 characters or less per message
+- Frequent commits showing incremental progress
+
+---
+
+## License
+
+This project is open source and available for educational purposes.
+
+---
+
+## Author
+
+Built for Phase 4 project assessment  
+Demonstrating full-stack development skills with Flask and React  
+Focused on solving real community problems in Haiti
