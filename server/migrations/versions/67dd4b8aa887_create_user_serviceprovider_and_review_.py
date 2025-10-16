@@ -1,8 +1,8 @@
 """Create User, ServiceProvider, and Review models
 
-Revision ID: cf09aceecd36
-Revises: 93f958601b30
-Create Date: 2025-10-14 15:47:37.470975
+Revision ID: 67dd4b8aa887
+Revises: 7ec582eeaefa
+Create Date: 2025-10-15 19:32:42.158842
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cf09aceecd36'
-down_revision = '93f958601b30'
+revision = '67dd4b8aa887'
+down_revision = '7ec582eeaefa'
 branch_labels = None
 depends_on = None
 
